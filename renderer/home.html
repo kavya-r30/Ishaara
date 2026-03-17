@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ishaara</title>
+  <style>
+    :root {
+      --bg:          #ffffff;
+      --surface:     #f8f9fa;
+      --surface2:    #f1f3f4;
+      --border:      #e8eaed;
+      --text:        #202124;
+      --muted:       #5f6368;
+      --accent:      #1a73e8;
+      --accent-d:    rgba(26,115,232,.10);
+      --shadow-soft: 0 2px 8px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+      --shadow-card: 0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+      --r-card: 18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: linear-gradient(160deg, #ffffff 0%, #f4f7fb 100%);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Slot-machine animation ─────────────────────────────────────────── */
+    @keyframes slotIn {
+      from { transform: translateY(60%); opacity: 0; }
+      to   { transform: translateY(0);   opacity: 1; }
+    }
+    @keyframes slotOut {
+      from { transform: translateY(0);    opacity: 1; }
+      to   { transform: translateY(-60%); opacity: 0; }
+    }
+    .slot-word {
+      display: inline-block;
+      animation: slotIn 0.38s cubic-bezier(.22,.68,0,1.2) both;
+    }
+    .slot-word.leaving {
+      animation: slotOut 0.28s cubic-bezier(.4,0,1,1) forwards;
+    }
+
+    /* ─── Page layout ─────────────────────────────────────────────────────── */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px 32px;
+      gap: 0;
+    }
+
+    /* ─── Brand ──────────────────────────────────────────────────────────── */
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .brand-logo svg { display: block; filter: drop-shadow(0 4px 12px rgba(0,0,0,.15)); }
+
+    .brand-reel {
+      position: relative;
+      height: 3.4rem;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-word {
+      font-size: clamp(2rem, 5vw, 2.9rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      white-space: nowrap;
+      line-height: 1;
+      padding: 0 8px;
+    }
+
+    .brand-tagline {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: 0.01em;
+      margin-bottom: 28px;
+    }
+
+    /* ─── Search bar ─────────────────────────────────────────────────────── */
+    .search-form { width: 100%; max-width: 540px; margin-bottom: 36px; }
+    .search-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 10px 10px 20px;
+      box-shadow: var(--shadow-soft);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .search-inner:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-d), var(--shadow-soft);
+    }
+    .search-icon { color: var(--muted); flex-shrink: 0; }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none; outline: none;
+      font-size: 15px;
+      color: var(--text);
+      font-family: inherit;
+    }
+    .search-input::placeholder { color: #adb5bd; }
+    .search-mic {
+      width: 34px; height: 34px;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      transition: background .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .search-mic:hover { background: var(--surface2); color: var(--accent); }
+
+    /* ─── Shortcuts grid ─────────────────────────────────────────────────── */
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 620px;
+      margin-bottom: 36px;
+    }
+    @media (max-width: 600px) {
+      .shortcuts-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .shortcut-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 10px 14px;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-card);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--shadow-soft);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .15s;
+      outline: none;
+    }
+    .shortcut-card:hover, .shortcut-card:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-card);
+      border-color: transparent;
+    }
+
+    .sc-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: transform .18s ease;
+    }
+    .shortcut-card:hover .sc-icon { transform: scale(1.1); }
+
+    .sc-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
+    .sc-desc {
+      font-size: 10.5px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.3;
+      margin-top: -4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
+
+    /* ─── Add shortcut ───────────────────────────────────────────────────── */
+    .shortcut-card.add-card {
+      border-style: dashed;
+      border-color: #ced4da;
+    }
+    .shortcut-card.add-card:hover {
+      border-color: var(--accent);
+      background: var(--accent-d);
+    }
+    .sc-icon.add-icon { background: var(--surface2); color: var(--muted); }
+    .shortcut-card.add-card:hover .sc-icon.add-icon {
+      background: var(--accent-d); color: var(--accent);
+    }
+    .shortcut-card.add-card .sc-label { color: var(--muted); }
+    .shortcut-card.add-card:hover .sc-label { color: var(--accent); }
+
+    /* ─── Footer ─────────────────────────────────────────────────────────── */
+    footer {
+      font-size: 11px;
+      color: var(--muted);
+      opacity: .6;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Modal ──────────────────────────────────────────────────────────── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.hidden { display: none; }
+    .modal-box {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.15);
+      padding: 24px;
+      width: 100%; max-width: 360px;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 15px; font-weight: 600; }
+    .modal-close {
+      width: 28px; height: 28px;
+      background: var(--surface);
+      border: none; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--muted);
+      transition: background .15s;
+    }
+    .modal-close:hover { background: var(--surface2); }
+    .modal-field { margin-bottom: 14px; }
+    .modal-label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; font-weight: 500; }
+    .modal-input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .modal-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-d);
+      background: #fff;
+    }
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+    .btn { flex: 1; padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); font-family: inherit; transition: all .15s; }
+    .btn-cancel { background: var(--surface); color: var(--muted); }
+    .btn-cancel:hover { background: var(--surface2); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { background: #1765cc; }
+  </style>
+</head>
+<body>
+  <main class="page" role="main">
+
+    <!-- Brand -->
+    <header class="brand" aria-label="Ishaara">
+      <div class="brand-logo">
+        <svg viewBox="0 0 64 64" width="52" height="52">
+          <rect width="64" height="64" rx="14" fill="#1a3a2e"/>
+          <g fill="#2fbe8f">
+            <rect x="20" y="34" width="24" height="16" rx="5"/>
+            <rect x="22" y="18" width="7"  height="18" rx="3.5"/>
+            <rect x="31" y="14" width="7"  height="22" rx="3.5"/>
+            <rect x="40" y="20" width="5"  height="16" rx="2.5"/>
+          </g>
+          <circle cx="22" cy="14" r="3.5" fill="#5fffc8"/>
+        </svg>
+      </div>
+
+      <div class="brand-reel" aria-label="Ishaara" style="min-width:220px">
+        <span id="brand-word" class="brand-word slot-word">Ishaara</span>
+      </div>
+
+      <p class="brand-tagline">Accessible browsing for everyone.</p>
+    </header>
+
+    <!-- Search bar -->
+    <form class="search-form" id="search-form" role="search">
+      <div class="search-inner">
+        <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input id="search-q" class="search-input" type="text"
+               placeholder="Search Google or enter a URL…"
+               autocomplete="off" autofocus />
+        <button type="button" class="search-mic" aria-label="Voice search" title="Voice search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/>
+            <path d="M19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11h-2z"/>
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    <!-- Shortcut cards -->
+    <section class="shortcuts-grid" id="shortcuts-grid" aria-label="Quick access">
+
+      <!-- Add shortcut -->
+      <button class="shortcut-card add-card" id="btn-add-shortcut">
+        <div class="sc-icon add-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </div>
+        <span class="sc-label">Add shortcut</span>
+      </button>
+
+    </section>
+
+    <footer>Ishaara · Accessible Browser · AfterMath ALOOgorithm Humanity</footer>
+  </main>
+
+  <!-- Add Shortcut Modal -->
+  <div class="modal-backdrop hidden" id="add-modal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Add shortcut">
+      <div class="modal-header">
+        <span class="modal-title">Add shortcut</span>
+        <button class="modal-close" id="modal-close" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label" for="modal-name">Name</label>
+        <input class="modal-input" id="modal-name" type="text" placeholder="e.g. Google Maps" />
+      </div>
+      <div class="modal-field">
+        <label class="modal-label" for="modal-url">URL</label>
+        <input class="modal-input" id="modal-url" type="text" placeholder="e.g. maps.google.com" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-cancel" id="modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="modal-done">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Slot machine animation ──────────────────────────────────────────────
+    const BRAND_WORDS = [
+      { text: 'Ishaara',   family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
+      { text: 'इशारा',     family: '"Noto Sans Devanagari", sans-serif' },
+      { text: 'ઇશારા',     family: '"Noto Sans Gujarati", sans-serif' },
+      { text: '⠊⠎⠓⠁⠁⠗⠁', family: '"Courier New", monospace' },
+    ];
+    let wordIdx = 0;
+    const wordEl = document.getElementById('brand-word');
+
+    function cycleWord() {
+      wordEl.classList.add('leaving');
+      setTimeout(() => {
+        wordIdx = (wordIdx + 1) % BRAND_WORDS.length;
+        const w = BRAND_WORDS[wordIdx];
+        wordEl.textContent = w.text;
+        wordEl.style.fontFamily = w.family;
+        wordEl.classList.remove('leaving');
+        wordEl.classList.add('slot-word');
+        void wordEl.offsetWidth; // reflow
+      }, 280);
+    }
+    setInterval(cycleWord, 2400);
+
+    // ── Search form ─────────────────────────────────────────────────────────
+    document.getElementById('search-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const q = document.getElementById('search-q').value.trim();
+      if (!q) return;
+      const isUrl = /^(https?:\/\/|www\.)/i.test(q);
+      window.location.href = isUrl ? q : 'https://www.google.com/search?q=' + encodeURIComponent(q);
+    });
+
+    // ── Shortcut cards ──────────────────────────────────────────────────────
+    document.querySelectorAll('.shortcut-card[data-url]').forEach(card => {
+      card.addEventListener('click', () => {
+        window.location.href = card.dataset.url;
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          window.location.href = card.dataset.url;
+        }
+      });
+    });
+
+    // ── Custom shortcuts ─────────────────────────────────────────────────────
+    const customShortcuts = JSON.parse(localStorage.getItem('ishaara_shortcuts') || '[]');
+    const grid = document.getElementById('shortcuts-grid');
+    const addBtn = document.getElementById('btn-add-shortcut');
+
+    function renderCustomShortcuts() {
+      document.querySelectorAll('.sc-custom').forEach(e => e.remove());
+      customShortcuts.forEach((cs, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'shortcut-card sc-custom';
+        const letter = (cs.label[0] || '?').toUpperCase();
+        btn.innerHTML = `
+          <div class="sc-icon" style="background:#f1f3f4;color:#5f6368;font-size:18px;font-weight:700">${letter}</div>
+          <span class="sc-label">${cs.label}</span>
+          <span class="sc-desc">${cs.url.replace(/^https?:\/\//, '').slice(0, 18)}</span>
+        `;
+        btn.addEventListener('click', () => {
+          window.location.href = cs.url.startsWith('http') ? cs.url : 'https://' + cs.url;
+        });
+        grid.insertBefore(btn, addBtn);
+      });
+    }
+    renderCustomShortcuts();
+
+    // ── Add shortcut modal ───────────────────────────────────────────────────
+    const modal  = document.getElementById('add-modal');
+    document.getElementById('btn-add-shortcut').addEventListener('click', () => modal.classList.remove('hidden'));
+    document.getElementById('modal-close').addEventListener('click',  () => modal.classList.add('hidden'));
+    document.getElementById('modal-cancel').addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
+
+    document.getElementById('modal-done').addEventListener('click', () => {
+      const name = document.getElementById('modal-name').value.trim();
+      const url  = document.getElementById('modal-url').value.trim();
+      if (!name || !url) return;
+      customShortcuts.push({ label: name, url });
+      localStorage.setItem('ishaara_shortcuts', JSON.stringify(customShortcuts));
+      renderCustomShortcuts();
+      document.getElementById('modal-name').value = '';
+      document.getElementById('modal-url').value  = '';
+      modal.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
