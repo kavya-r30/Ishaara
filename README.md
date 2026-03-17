@@ -1,56 +1,167 @@
-# AccessAI Browser
+<p align="center">
+  <img src="favicon.svg" width="72" alt="Ishaara Logo"/>
+</p>
 
-An agentic, Chromium-based web browser designed for people with disabilities. Navigate any website using **voice or text commands** powered by **Mistral AI** — the browser reads, understands, and acts on the live DOM for you.
+<h1 align="center">Ishaara</h1>
+<p align="center"><strong>A Human-Adaptive Edge-AI Browser</strong></p>
+<p align="center">
+  Dismantling digital barriers for users with disabilities and low digital literacy, in real time, on-device, at zero AI cost.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Electron%20%7C%20React%20Native-blue?style=flat-square"/>
+  <img src="https://img.shields.io/badge/AI-Edge%20%7C%20On--Device-green?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Privacy-100%25%20Local-purple?style=flat-square"/>
+  <img src="https://img.shields.io/badge/License-MIT-orange?style=flat-square"/>
+</p>
 
 ---
 
-## Features
+## What is Ishaara?
+
+Most browsers treat users as passengers. They render what websites give them and expect users to adapt. **Ishaara does the opposite.**
+
+Ishaara is a high-performance, accessibility-focused web browser powered by a **Human-Adaptive Engine** that re-engineers websites in real-time. Instead of asking the user to learn the machine, Ishaara makes the machine learn the user, detecting disabilities, preferences, and literacy levels at startup and silently reshaping the entire web experience to match.
+
+All AI runs **locally on your device**. No cloud. No cost. No privacy tradeoff.
+
+<p align="center">
+  <img src="demo/demo_ss_both.jpg" width="780" alt="Ishaara Desktop and Mobile Screenshots"/>
+</p>
+
+---
+
+## Core Features
+
+### Adaptive Entry and Environment Detection
+
+Ishaara instantly detects specific user needs at launch and activates dedicated high-performance environments.
+
+| Mode | What It Does |
+|------|-------------|
+| **ADHD Zen Mode** | Uses DOM injection to physically strip flashing ads, pop-ups, and cognitive clutter before they render |
+| **Sign-Language Canvas** | Translates hand gestures into browser actions (scroll, submit, navigate) via local vision processing |
+| **High Contrast** | Forces black/white rendering for low-vision users |
+| **Dyslexia Font** | Switches to dyslexia-friendly typography with wide letter spacing |
+| **Colour Filters** | Protanopia, deuteranopia, tritanopia, and greyscale overlays |
+
+### Inclusive Dialogue and Guided Navigation
 
 | Feature | Description |
-|---|---|
-| 🎤 Voice Commands | Speak naturally to navigate, click, type, or search |
-| 🤖 Mistral AI Backend | Understands full page context (DOM, links, forms, headings) |
-| 🖱 Action Execution | Click elements, fill forms, scroll, submit — all hands-free |
-| 🌓 High Contrast | Forces black/white colours for low-vision users |
-| 🔊 Text-to-Speech | Reads any section aloud with adjustable speed & voice |
-| 📄 Page Simplifier | Strips ads, sidebars, banners — leaves clean readable text |
-| Dy Dyslexia Font | Dyslexia-friendly typography with wide spacing |
-| 🌈 Colour Filters | Protanopia, deuteranopia, tritanopia, greyscale |
-| 🔍 Smart Zoom | 50%–300% zoom applied live to the page |
-| 💬 Conversation History | Remembers context across multiple commands |
+|---------|-------------|
+| **Multilingual Agent** | An AI companion that simplifies complex web navigation into natural-language conversation, handling interaction on the user's behalf |
+| **Regional Oration** | Sarvam TTS integration for realistic, high-fidelity audio guidance across Indian regional languages |
+| **Frictionless Navigation** | "Digital Friend" logic that automates clicking and form-filling for users with motor impairments or tremors |
+| **Voice Commands** | Speak to navigate, click, type, scroll, or search, hands-free |
+
+### Privacy and Security
+
+- **Edge-First Architecture** - camera and microphone inputs are processed entirely on-device
+- **Local Encrypted Memory** - user context and preferences stored locally; zero data transmitted to external servers
+- **Zero AI Cost** - runs quantized open-source Llama and Mistral models via TensorFlow.js
+
+---
+
+## Architecture
+
+Ishaara is built on a dual-platform engine designed to deliver high-level intelligence without high-level hardware requirements.
+
+<p align="center">
+  <img src="demo/arch_diag.png" width="720" alt="Ishaara Architecture Diagram"/>
+</p>
+
+### File Structure
+
+```
+Ishaara/
+├── main.js                  # Electron main process, window, IPC, AI bridge
+├── preload.js               # Context bridge, exposes safe APIs to renderer
+├── src/
+│   └── mistral-service.js   # Local AI client (Mistral/Llama), prompt engineering
+└── renderer/
+    ├── index.html            # Browser shell, toolbar, AI panel, gesture canvas
+    ├── styles.css            # Accessibility-first stylesheet
+    ├── app.js                # DOM extraction, action executor, voice, TTS, chat UI
+    └── home.html             # Custom adaptive home/new-tab page
+```
+
+### Platform Layers
+
+```
++-------------------------------------------------------------+
+|                    Desktop Core (Electron)                   |
+|        Chromium + DOM Injection, Real-time re-engineering    |
++-------------------------------------------------------------+
+|               Mobile Bridge (React Native + WebView)         |
+|       Optimised for 1-2 GB RAM entry-level smartphones       |
++-------------------------------------------------------------+
+|                     Edge-AI Engine                           |
+|  Quantized Llama / Mistral, TensorFlow.js, 100% On-Device   |
++-------------------------------------------------------------+
+```
+
+### Data Flow
+
+```
+User speaks / types / gestures
+  -> Gesture/Voice layer processes input locally
+    -> DOM extracted from live page (executeJavaScript)
+      -> Local AI (Mistral/Llama) reasons over DOM + command + history
+        -> Returns: speech, actions[], simplification
+          -> Actions executed on webview (click / type / navigate / a11y)
+            -> Sarvam TTS reads response aloud in user's language
+```
 
 ---
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
 - [Node.js](https://nodejs.org) v18 or later
-- A free [Mistral API key](https://console.mistral.ai)
+- API keys for the services listed below
 
-### 2. Install
+### Install
 
 ```bash
-cd AF2
+git clone https://github.com/your-org/ishaara.git
+cd ishaara
 npm install
 ```
 
-### 3. Configure
+### Configure
 
-```bash
-cp .env.example .env
-# Edit .env and add your Mistral API key
+Create a `.env` file in the project root with the following keys:
+
+```env
+MISTRAL_API_KEY=your_mistral_api_key
+MISTRAL_MODEL=mistral-large-latest
+GROQ_API_KEY=your_groq_api_key
+TAVILY_API_KEY=your_tavily_api_key
+SARVAM_API_KEY=your_sarvam_api_key
+GEMINI_API_KEY=your_gemini_api_key
+ASSEMBLYAI_API_KEY=your_assemblyai_api_key
 ```
 
-Or skip this step — the browser will prompt you for your API key when it first opens.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MISTRAL_API_KEY` | **Required** | Mistral API key for the on-device AI agent |
+| `MISTRAL_MODEL` | **Required** | Model name, e.g. `mistral-large-latest` |
+| `GROQ_API_KEY` | **Required** | Groq API key for fast inference |
+| `TAVILY_API_KEY` | **Required** | Tavily API key for web search |
+| `SARVAM_API_KEY` | **Required** | Sarvam TTS key for regional audio guidance |
+| `GEMINI_API_KEY` | **Required** | Google Gemini API key |
+| `ASSEMBLYAI_API_KEY` | **Required** | AssemblyAI key for speech-to-text |
 
-### 4. Run
+You can also enter keys at runtime via the **Settings** panel.
+
+### Run
 
 ```bash
 npm start
 ```
 
-To run in developer mode (DevTools open):
+Developer mode (DevTools open):
 
 ```bash
 npm run start:dev
@@ -58,122 +169,30 @@ npm run start:dev
 
 ---
 
-## How to Use
-
-### Voice Commands
-Press **Ctrl+Shift+V** (or click the 🎤 button in the toolbar or chat panel) to activate voice input. Speak your command naturally:
-
-> *"Go to Wikipedia"*
-> *"Read me the main article"*
-> *"Click the search button"*
-> *"Fill in the search box with 'accessible travel'"*
-> *"Make the text bigger"*
-> *"Turn on high contrast mode"*
-> *"Simplify this page"*
-> *"What is on this page?"*
-> *"Scroll down"*
-> *"Go back"*
-
-### Text Commands
-Type any command in the chat panel and press **Enter** (or click Send).
-
-### Quick Accessibility Buttons
-The six buttons in the AI panel header give instant one-click access to:
-- 🌓 High contrast toggle
-- **Aᴬ** Larger text (cycles through sizes)
-- 📄 Page simplification
-- 🔗 Highlight all links
-- 🔊 Read page aloud
-- **Dy** Dyslexia-friendly font
-
-### Accessibility Settings Drawer
-Click ♿ in the toolbar for full control:
-- Precise zoom slider
-- TTS voice and speed selection
-- Colour-blindness filters
-- Auto-read on page load
-
----
-
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
-|---|---|
+|----------|--------|
 | `Ctrl+Shift+V` | Toggle voice command |
 | `Ctrl+L` | Focus address bar |
 | `F5` | Reload page |
-| `Alt+←` | Go back |
-| `Alt+→` | Go forward |
+| `Alt+Left` | Go back |
+| `Alt+Right` | Go forward |
 | `Esc` | Stop speaking / close panel |
 | `Enter` in chat | Send command |
 | `Shift+Enter` | New line in chat |
 
 ---
 
-## Architecture
+## Example Voice Commands
 
-```
-AF2/
-├── main.js                  # Electron main process — window, IPC, Mistral bridge
-├── preload.js               # Context bridge — exposes safe APIs to renderer
-├── src/
-│   └── mistral-service.js   # Mistral AI client, prompt engineering, JSON parsing
-└── renderer/
-    ├── index.html            # Browser shell — navigation, AI panel, modals
-    ├── styles.css            # Accessibility-first dark-theme stylesheet
-    ├── app.js                # All renderer logic: DOM extraction, action executor,
-    │                         #   voice recognition, TTS, chat UI, a11y engine
-    └── home.html             # Custom home/new-tab page
-```
+> "Go to the UIDAI website"
+> "Fill in the Aadhaar form with my details"
+> "Read me the main content"
+> "Turn on ADHD mode"
+> "Make the text bigger"
+> "Scroll down slowly"
+> "Click the submit button"
+> "What does this page say?"
 
-### Data Flow
 
-```
-User speaks/types command
-  → app.js extracts page DOM (executeJavaScript)
-    → IPC → main.js → Mistral API (with DOM + command + history)
-      → Mistral returns: { speech, actions[], explanation }
-        → IPC → app.js renders chat message + speaks response
-          → Executes each action on the webview (click/type/navigate/a11y…)
-```
-
----
-
-## API Key Setup
-
-1. Visit [console.mistral.ai](https://console.mistral.ai)
-2. Sign up for a free account
-3. Create an API key
-4. Either:
-   - Add it to your `.env` file as `MISTRAL_API_KEY=sk-…`
-   - Or enter it in the browser Settings (⚙️ button) at runtime
-
-The **Mistral Large** model is recommended for best comprehension. Use **Mistral Small** for faster, cheaper responses.
-
----
-
-## Accessibility Compliance
-
-This browser is designed to meet **WCAG 2.1 AA** guidelines:
-- All interactive elements have ARIA labels
-- Focus is always visible (2.5px accent outline)
-- Colour contrast ratios exceed 4.5:1
-- Reduced motion respected via `prefers-reduced-motion`
-- Screen reader compatible structure (`role`, `aria-live`, `aria-label`)
-- All functionality accessible via keyboard alone
-
----
-
-## Troubleshooting
-
-**Voice not working?**
-Voice recognition requires a microphone. On Linux, you may need to allow the `media` permission. The Web Speech API requires Chromium (included in Electron).
-
-**Page not loading?**
-Some pages block embedding. The webview uses a real Chromium engine — most public sites will load normally.
-
-**Mistral returns errors?**
-Check your API key in Settings. If you hit rate limits, switch to `mistral-small-latest` (faster, cheaper).
-
-**Actions fail on a page?**
-Modern SPAs (React, Vue) may re-render after an action. Try adding a command like "wait then click…" or repeat the action.
