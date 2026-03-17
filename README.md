@@ -40,7 +40,7 @@ Ishaara instantly detects specific user needs at launch and activates dedicated 
 | Mode | What It Does |
 |------|-------------|
 | **ADHD Zen Mode** | Uses DOM injection to physically strip flashing ads, pop-ups, and cognitive clutter before they render |
-| **Sign-Language Canvas** | Extracts on-screen content via DOM, converts it to Gloss, then renders Indian Sign Language using a 3D avatar |
+| **Sign-Language Canvas** | Extracts on-screen content via DOM, summarizes it and converts it to Gloss, then renders Indian Sign Language using a 3D avatar |
 | **High Contrast** | Forces black/white rendering for low-vision users |
 | **Dyslexia Font** | Switches to dyslexia-friendly typography with wide letter spacing |
 | **Colour Filters** | Protanopia, deuteranopia, tritanopia, and greyscale overlays |
